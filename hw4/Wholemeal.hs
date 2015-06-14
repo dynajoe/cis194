@@ -17,3 +17,21 @@ fun2 n
 
 fun2' :: Integer -> Integer
 fun2' = sum . filter even . takeWhile (/= 1) . iterate (\x -> if even x then x `div` 2 else 3 * x + 1)
+
+-- Exercise 2
+data Tree a = Leaf
+   | Node Integer (Tree a) a (Tree a)
+   deriving (Show, Eq)
+
+insertTree :: a -> Tree a -> Tree a
+insertTree a Leaf = Node 0 Leaf a Leaf
+insertTree a (Node _ l v r) = case (l, r) of
+   (Node lh _ _ _, Node rh _ _ _) ->
+      if lh >= rh
+      then case (insertTree a r) of nn@(Node nh _ _ _) -> (Node (nh + 1) l v nn)
+      else case (insertTree a l) of nn@(Node nh _ _ _) -> (Node (nh + 1) nn v r)
+   (Leaf, _) -> Node 1 (insertTree a l) v r
+   (_, Leaf) -> Node 1 l v (insertTree a r)
+
+foldTree :: [a] -> Tree a
+foldTree = foldr insertTree Leaf
