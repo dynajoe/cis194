@@ -29,31 +29,27 @@ indexJ j (Single _ x)
    | j == 0 = Just x
    | otherwise = Nothing
 indexJ j (Append x l r)
-   | j > s = Nothing
-   | j <= ls = indexJ (j - 1) l
-   | otherwise = indexJ (j - 1) r
+   | j >= s = Nothing
+   | j < ls = indexJ j l
+   | otherwise = indexJ (j - ls) r
    where s = getSize $ size x
          ls = getSize $ size $ tag l
 
 dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
-dropJ n (Append a b c)
-   | n >= sa = Empty
-   | n >= sb = dropJ (n - sb) c
-   | otherwise = dropJ n b +++ c
-   where sa = getSize . size $ a
-         sb = getSize . size . tag $ b
+dropJ n (Append _ l r)
+   | n > sl = dropJ (n - sl) r
+   | otherwise = dropJ n l +++ r
+   where sl = getSize . size . tag $ l
 dropJ n x
    | n >= sa = Empty
    | otherwise = x
    where sa = getSize . size . tag $ x
 
 takeJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
-takeJ n x@(Append a b c)
-   | n >= sa = x
-   | n >= sb = b +++ takeJ (n - sb) c
+takeJ n (Append _ b c)
+   | n > sb = b +++ takeJ (n - sb) c
    | otherwise = takeJ n b
-   where sa = getSize . size $ a
-         sb = getSize . size . tag $ b
+   where sb = getSize . size . tag $ b
 takeJ n x
    | n >= s = x
    | otherwise = Empty
