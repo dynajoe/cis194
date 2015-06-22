@@ -6,6 +6,7 @@ import StackVM
 import ExprT
 import Parser (parseExp)
 import Data.Maybe
+import qualified Data.Map as M
 
 eval :: ExprT -> Integer
 eval (ExprT.Add l r) = eval l + eval r
