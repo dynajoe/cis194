@@ -23,22 +23,20 @@ moreFun a b
    -- subForest :: [Tree a] -- zero or more child trees
 -- }
 treeFold :: (a -> [b] -> b) -> Tree a -> b
-treeFold fn (Node {rootLabel = v, subForest = c}) = fn v (map (treeFold fn) c)
+treeFold fn (Node {rootLabel = boss, subForest = emps}) = fn boss (map (treeFold fn) emps)
 
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
-nextLevel b gls = (bestWithBoss, bestWithoutBoss)
-   where withBoss = map (glCons b . fst) gls
-         withoutBoss = map snd gls
-         bestWithBoss = maximumGL withBoss
-         bestWithoutBoss = maximumGL withoutBoss
+nextLevel boss gls = (withBoss, withoutBoss)
+   where withBoss = glCons boss $ mconcat $ map snd gls
+         withoutBoss = mconcat $ map (uncurry max) gls 
 
 maximumGL :: [GuestList] -> GuestList
 maximumGL [] = mempty
 maximumGL x = maximum x
 
 maxFun :: Tree Employee -> GuestList
-maxFun n = max (fst r) (snd r)
-   where r = treeFold nextLevel n
+maxFun employeeTree = max (fst r) (snd r)
+   where r = treeFold nextLevel employeeTree
 
 bestGuestList :: String -> GuestList
 bestGuestList = maxFun . read
