@@ -15,7 +15,8 @@ parse d = parseMessage <$> lines d
 insert :: LogMessage -> MessageTree -> MessageTree
 insert (Unknown _) root = root
 insert msg (Leaf) = Node Leaf msg Leaf
-insert msg@(LogMessage _ nts _) (Node l lm@(LogMessage _ ts _) r) = case nts < ts of
+insert msg@(LogMessage _ nts _) (Node l lm@(LogMessage _ ts _) r) =
+  case nts < ts of
     False -> Node l lm (insert msg r)
     True -> Node (insert msg l) lm r
 

@@ -44,7 +44,8 @@ executeBattle b = x
    where (a, d) = getSizedArmies b
          aRolls  = rollTimes a >>= (pure . sort)
          dRolls  = rollTimes d >>= (pure . sort)
-         pairs   = zip <$> aRolls <*> dRolls
+         pairs   = zip <$> aRolls
+                       <*> dRolls
          results = fmap (map (uncurry (>))) pairs
          x = fmap (foldr reduceArmies (a, d)) results
 
@@ -69,7 +70,8 @@ executeBattle' (Battlefield a d) rolls = uncurry Battlefield newArmies
 battle' :: Battlefield -> Rand StdGen Battlefield
 battle' b = liftM (executeBattle' b) rolls
    where (a, d) = getSizedArmies b
-         rolls = (,) <$> (rollTimes a >>= (pure . sort)) <*> (rollTimes d >>= (pure . sort))
+         rolls = (,) <$> (rollTimes a >>= (pure . sort))
+                     <*> (rollTimes d >>= (pure . sort))
 
 invade :: Battlefield -> Rand StdGen Battlefield
 invade b@(Battlefield a d)
